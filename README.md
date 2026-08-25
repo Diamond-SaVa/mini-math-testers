@@ -51,4 +51,7 @@ Player answers correctly
    CountdownTimer renders
 
 ## Features to Add
-Sound Cues and Visual Feedback that better notifies the player of their answers.
+* Sound Cues and Visual Feedback that better notifies the player of their answers.
+* Design and Think of an appropriate End Condition (Goal, Game Over, etc.)
+* Gradual Difficulty Increment
+* Different Game Modes 
