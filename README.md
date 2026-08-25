@@ -1,16 +1,54 @@
-# React + Vite
+# Mini Math Testers
+## Proof of Concept
+A simple but re-playable mini game to pass the time.
+Developed using React and JSX to learn and grow with React Web Development.
+## Functionality and Component Communication
+This is a simple mini game working through React Components communicating with App as the "middle-man" handling the refresh of the Countdown Timer and the regeneration of new math problems.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+                 App
+                /   \
+               /     \
+              ▼       ▼
+           Timer     Game
 
-Currently, two official plugins are available:
+              ┌─────────────────────┐
+              │       App.jsx       │
+              │                     │
+              │ timeBonus = 0       │
+              └──────────┬──────────┘
+                         │
+                         │ prop
+                         ▼
+              ┌─────────────────────┐
+              │  CountdownTimer     │
+              │                     │
+              │ timeBonus = 0       │
+              └─────────────────────┘
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-## React Compiler
+Player answers correctly
+          │
+          ▼
+   MathMiniGame
+          │
+          │ callback
+          ▼
+       App.jsx
+          │
+          │ setTimeBonus(1)
+          ▼
+    App re-renders
+          │
+          │ prop changes
+          ▼
+   CountdownTimer
+          │
+          │ componentDidUpdate()
+          ▼
+ timerSeconds += 10
+          │
+          ▼
+   CountdownTimer renders
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Features to Add
+Sound Cues and Visual Feedback that better notifies the player of their answers.
