@@ -1,3 +1,9 @@
+#mathFormula {
+  display: flex;
+  flex-direction: column;
+  line-height: 50.0px;
+}
+
 .answer {
   padding: 10px;
   margin: 10px;

@@ -24,6 +24,7 @@ function App() {
 
         if (isCorrect) {
             setTimeBonus(prev => prev + 1);
+            setCount(prev => prev + 1);
         }
     };
 
@@ -47,6 +48,13 @@ function App() {
         >
             {message}
         </button>
+
+          <button
+              type="button"
+              className="counter"
+          >
+              Correct Answers : {count}
+          </button>
       </section>
 
       <div className="ticks"></div>

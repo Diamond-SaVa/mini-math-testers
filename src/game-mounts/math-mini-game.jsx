@@ -7,77 +7,120 @@ class MathMiniGame extends React.Component
        super(props);
        
        this.state = {
-           numberA : 0,
-           numberB : 0,
-           mathFunc : 0,
            rightAnswer: 0,
-           answers: []
+           answers: [],
+           variables: [],
+           mathFunctions: [],
+           difficulty: 5
        }
    }
 
     printRightAnswer = () =>
     {
         let theAnswer = 0;
-        switch (this.state.mathFunc)
+        
+        this.state.mathFunctions.forEach((value, index) => 
         {
-            case 0:
-                theAnswer = this.state.numberA + this.state.numberB;
-                break;
-            case 1:
-                theAnswer = this.state.numberA - this.state.numberB;
-                break;
-            case 2:
-                theAnswer = this.state.numberA * this.state.numberB;
-                break;
-        }
+            let consoleText = "";
+            if (index === 0) {
+                if (value === "+") 
+                {
+                    theAnswer = (this.state.variables[index] + this.state.variables[index + 1]);
+                    consoleText = this.state.variables[index].toString() + " + " + 
+                        this.state.variables[index + 1].toString() + " = " + theAnswer.toString();
+                } 
+                else 
+                {
+                    theAnswer = (this.state.variables[index] - this.state.variables[index + 1]);
+                    consoleText = this.state.variables[index].toString() + " - " +
+                        this.state.variables[index + 1].toString() + " = " + theAnswer.toString();
+                }
+                
+                console.log(consoleText)
+            }
+            else
+            {
+                consoleText = theAnswer.toString();
+                
+                if (value === "+")
+                {
+                    theAnswer += this.state.variables[index + 1];
+                    
+                    consoleText += " + " + this.state.variables[index + 1].toString() + " = " + theAnswer.toString();
+                }
+                else
+                {
+                    theAnswer -= this.state.variables[index + 1];
+
+                    consoleText += " - " + this.state.variables[index + 1].toString() + " = " + theAnswer.toString();
+                }
+
+                console.log(consoleText)
+            }
+        });
+        
         return theAnswer;
     }
-
-    printWrongAnswer = () =>
-    {
-        const Variance = this.generateRandomNumber(-5, 5);
-        const VarianceA = this.state.numberA + Variance;
-        const VarianceB = this.state.numberB + Variance;
-        let WrongAnswer = 0;
-
-        switch (this.state.mathFunc)
-        {
-            case 0:
-                WrongAnswer = VarianceA + VarianceB;
-                if (WrongAnswer === this.printRightAnswer())
-                {
-                    WrongAnswer++;
-                }
-                break;
-            case 1:
-                WrongAnswer = VarianceA - VarianceB;
-                if (WrongAnswer === this.printRightAnswer())
-                {
-                    WrongAnswer--;
-                }
-                break;
-            case 2:
-                WrongAnswer = (this.state.numberA * this.state.numberB) + VarianceB;
-                if (WrongAnswer === this.printRightAnswer())
-                {
-                    WrongAnswer++;
-                }
-                break;
-        }
-
-        return WrongAnswer;
+    
+    printWrongAnswer = (rightAnswer) => {
+        // Configuration for your range
+        const variance = this.generateRandomNumber(-5, 5);
+        
+        return (rightAnswer + variance);
     }
 
     generateRandomNumber = (min, max) => {
         // Configuration for your range
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
+    
+    returnMathFunc = (value) =>
+    {
+        let mathSymbol = "";
+        switch(value)
+        {
+            case 0:
+            case 3:
+            case 4:
+                mathSymbol = "+";
+                break;
+            case 1:
+            case 2:
+            case 5:
+                mathSymbol = "-";
+                break;
+        }
+        return mathSymbol;
+    }
 
     generateNumbers = () => {
-        this.setState({
-            numberA: this.generateRandomNumber(0, 10),
-            numberB: this.generateRandomNumber(0, 10),
-            mathFunc: this.generateRandomNumber(0, 2)
+        this.setState( () => {
+            // Restart all Variables and Math Functions
+            this.state.variables = [];
+            this.state.mathFunctions = [];
+            // Additive system to make a math problem with more than 2 variables if possible.
+            for (let i = 0; i <= this.state.difficulty; i++) {
+                let mathSymbol = "";
+                
+                if (i === 0) {
+                    const numberA = this.generateRandomNumber(0, 10);
+                    this.state.variables.push(numberA);
+                    
+                    mathSymbol = this.returnMathFunc(this.generateRandomNumber(0, 5));
+                    this.state.mathFunctions.push(mathSymbol);
+
+                    const numberB = this.generateRandomNumber(0, 10);
+                    this.state.variables.push(numberB);
+                } 
+                else
+                {
+                    mathSymbol = this.returnMathFunc(this.generateRandomNumber(0, 5));
+                    this.state.mathFunctions.push(mathSymbol);
+
+                    const numberX = this.generateRandomNumber(0, 10);
+                    this.state.variables.push(numberX);
+                }
+            }
         }, () => {
             this.setAnswerOrder();
         });
@@ -86,9 +129,9 @@ class MathMiniGame extends React.Component
     setAnswerOrder = () => {
         const constRightAnswer = this.printRightAnswer();
         
-        let wrongAnswerA = this.printWrongAnswer();
+        let wrongAnswerA = this.printWrongAnswer(constRightAnswer);
         
-        let wrongAnswerB = this.printWrongAnswer();
+        let wrongAnswerB = this.printWrongAnswer(constRightAnswer);
         
         if(wrongAnswerA === constRightAnswer)
         {
@@ -133,19 +176,6 @@ class MathMiniGame extends React.Component
             answers: constAnswers
         });
     }
-    
-    printMathFunc = () => 
-    {
-       switch (this.state.mathFunc) 
-       {
-           case 0:
-               return " + ";
-           case 1:
-               return " - ";
-           case 2:
-               return " x ";
-       }
-    }
 
     componentDidMount() {
        this.generateNumbers();
@@ -165,20 +195,49 @@ class MathMiniGame extends React.Component
     }
 
     render() {
+
+        let mathFormulaText = "";
+
+        this.state.mathFunctions.map((value, index) => {
+
+            if (index === 0)
+            {
+                mathFormulaText += this.state.variables[index] + " " + value + " " + this.state.variables[index + 1] ;
+            }
+            else
+            {
+                mathFormulaText += " " + value + " " + this.state.variables[index + 1];
+            }
+        });
+       
+        const mathFormula = () => {
+            return (
+                <p>
+                    { mathFormulaText }
+                </p>
+            );
+        }
+       
+        const listOfButtons = this.state.answers.map((answer, index) => {
+            return (
+                <ButtonAnswer
+                    key={index}
+                    value={answer}
+                    onAnswer={this.handleSubmitAnswer}
+                />
+            );
+        });
+       
        return (<div style={{ textAlign: 'center', fontFamily: 'monospace', fontSize: '2rem' }}>
            <div>
                <h3>
-                   {this.state.numberA} 
-                   {this.printMathFunc()}
-                   {this.state.numberB}
+                   <p id={"mathFormula"}>{mathFormulaText} = ???</p>
                </h3>
            </div>
            <br/>
            <div style={{ textAlign: 'center', fontFamily: 'monospace', fontSize: '2rem'}}>
                <form>
-               <ButtonAnswer value={this.state.answers[0]} onAnswer={this.handleSubmitAnswer}/>
-               <ButtonAnswer value={this.state.answers[1]} onAnswer={this.handleSubmitAnswer}/>
-               <ButtonAnswer value={this.state.answers[2]} onAnswer={this.handleSubmitAnswer}/>
+                   {listOfButtons}
                </form>
            </div>
        </div>)
