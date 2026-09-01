@@ -1,4 +1,5 @@
 ﻿import React from "react";
+import './countdown-timer.css'
 
 class CountdownTimer extends React.Component 
 {
@@ -51,7 +52,7 @@ class CountdownTimer extends React.Component
     componentDidUpdate(prevProps) {
         if (this.props.timeBonus !== prevProps.timeBonus) {
             this.setState(prevState => ({
-                timerSeconds: prevState.timerSeconds + 5
+                timerSeconds: Math.min(Math.max(prevState.timerSeconds + 5, 0), 60) 
             }));
         }
     }
@@ -70,12 +71,23 @@ class CountdownTimer extends React.Component
     render() {
         const { timerSeconds } = this.state;
         
+        const  progressPercentage = (timerSeconds / 60) * 100;
+        
         return (
             <div style={{ textAlign: 'center', fontFamily: 'monospace', fontSize: '2rem' }}>
                 {timerSeconds > 0 ? (
                     <div>
                         <h3>Time Remaining</h3>
                         <div>{this.formatTime(timerSeconds)}</div>
+                        <br/>
+                        <div id="progress-bg" role="progressbar" aria-valuenow={progressPercentage}
+                             aria-valuemin="0" aria-valuemax="100">
+                            <div
+                                id="progress-fill"
+                                style={{ width: `${progressPercentage}%` }}
+                            >
+                            </div>
+                        </div>
                     </div>
                 ) : (
                     <div style={{ color: 'red', fontWeight: 'bold' }}>
