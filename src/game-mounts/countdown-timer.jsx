@@ -20,7 +20,7 @@ class CountdownTimer extends React.Component
         event.preventDefault();
 
         this.setState(prevState => ({
-            timerSeconds: prevState.timerSeconds + 10
+            timerSeconds: Math.min(Math.max(prevState.timerSeconds + 5, 0), 60)
         }));
     }
 
@@ -96,7 +96,9 @@ class CountdownTimer extends React.Component
                 )}
                 <br />
                 <div style={{ textAlign: 'center', fontFamily: 'monospace', fontSize: '2rem' }}>
-                    <button type="submit" className="counter" onClick={this.handleTimerIncreaseComponent}>COUNT UP</button>
+                    <button type="submit" className="counter" onClick={this.handleTimerIncreaseComponent}>
+                        COUNT UP
+                    </button>
                 </div>
             </div>
         );
