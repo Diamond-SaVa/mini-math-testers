@@ -1,3 +1,7 @@
+.game-components {
+  width: 100%;
+}
+
 .slide-from-left {
   transform: translateX(-200%);
   opacity: 0;
@@ -57,7 +61,7 @@
 .answer {
   padding: 10px;
   margin: 10px;
-  width: 100px;
+  width: 50px;
   height: 50px;
   display: inline-flex;
 
@@ -107,11 +111,14 @@
   }
 
   .framework {
+    color: white;
     z-index: 1;
-    top: 34px;
-    height: 28px;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
-      scale(1.4);
+    top: 45%;
+    left: 23%;
+    height: 10px;
+    text-rendering: optimizeSpeed;
+    /** /    transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
+      scale(1.4); /**/
   }
 
   .vite {
@@ -127,7 +134,7 @@
 #center {
   display: flex;
   flex-direction: column;
-  gap: 25px;
+  gap: 15px;
   place-content: center;
   place-items: center;
   flex-grow: 1;
@@ -145,7 +152,7 @@
 
   & > div {
     flex: 1 1 0;
-    padding: 32px;
+    padding: 5px;
     @media (max-width: 1024px) {
       padding: 24px 20px;
     }

@@ -124,9 +124,7 @@ class CountdownTimer extends React.Component
             <div className={`slide-from-left ${slideClass}`} style={{ textAlign: 'center', fontFamily: 'monospace', fontSize: '2rem' }}>
                 {timerSeconds >= 0 ? (
                     <div>
-                        <h3>Time Remaining</h3>
-                        <div>{this.formatTime(timerSeconds)}</div>
-                        <br/>
+                        <h5>Time Gauge</h5>
                         <div id="progress-bg" role="progressbar" aria-valuenow={progressPercentage}
                              aria-valuemin="0" aria-valuemax="100">
                             <div
@@ -135,18 +133,15 @@ class CountdownTimer extends React.Component
                             >
                             </div>
                         </div>
+                        <button type="submit" className="counter" onClick={this.handleTimerIncreaseComponent}>
+                            COUNT UP
+                        </button>
                     </div>
                 ) : (
                     <div style={{ color: 'red', fontWeight: 'bold' }}>
                         🎉 Time's Up!
                     </div>
                 )}
-                <br />
-                <div style={{ textAlign: 'center', fontFamily: 'monospace', fontSize: '2rem' }}>
-                    <button type="submit" className="counter" onClick={this.handleTimerIncreaseComponent}>
-                        COUNT UP
-                    </button>
-                </div>
             </div>
         );
     }

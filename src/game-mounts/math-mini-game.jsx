@@ -134,7 +134,7 @@ class MathMiniGame extends React.Component
                 newMathFunctions.push(mathSymbol);
 
                 const numberX = this.generateRandomNumber(0, 10);
-                newMathFunctions.push(numberX);
+                newVariables.push(numberX);
             }
         }
        
@@ -264,9 +264,9 @@ class MathMiniGame extends React.Component
        return (<div className={`slide-from-right ${slideClass}`} style={{ textAlign: 'center', fontFamily: 'monospace', 
            fontSize: '2rem' }}>
            <div>
-               <h3>
+               <h5>
                    <p id={"mathFormula"}>{mathFormulaText} = ???</p>
-               </h3>
+               </h5>
            </div>
            <br/>
            <div style={{ textAlign: 'center', fontFamily: 'monospace', fontSize: '2rem'}}>

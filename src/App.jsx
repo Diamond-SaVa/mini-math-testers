@@ -90,16 +90,26 @@ function App() {
         { menuIsActive ? (
             <section id="center" className={`main-menu slide-vertical ${slideClassBeforeGameStart}`}>
                 <div className="hero">
-                    <img src={gameLogo} className="base" width="170" height="179" alt="" />
+                    <p>
+                    <button
+                        type="button"
+                        className="counter"
+                        onClick={() => {
+                            initiateTimerForMenuOut();
+
+                            setGameStart(true);
+                        }}
+                    >
+                        RESET SCORE
+                    </button>
+                    </p>
+                    <img src={gameLogo} className="base" alt="" />
+                    <label className="framework">HI-SCORE : {solvedProblemsRecord}</label>
                 </div>
                 <div>
                     <h1>Mini Math Testers!</h1>
                     <p>
                         <code>Proof of Concept and React Development Learning</code>
-                    </p>
-                    <br/>
-                    <p>
-                        <code>Current Record of Solved Problems : {solvedProblemsRecord} </code>
                     </p>
                 </div>
                 <button
@@ -117,7 +127,6 @@ function App() {
         ) :
             null
         }
-
         { gameStart && !menuIsActive ? (
             <>
                 <ScoreCounter
@@ -125,19 +134,17 @@ function App() {
                     solvedProblems = {solvedProblems}
                     gameStart={!gameOver}
                 />
-                <section className="game-components" id="next-steps">
-                    <CountdownTimer
-                        initialSeconds={5}
-                        solvedProblems={solvedProblems}
-                        onGameStateChange= {handleGameStateChange}
-                        gameStart={!gameOver}
-                    />
-                    <MathMiniGame
-                        onSubmitData={handleAnswerCompare}
-                        solvedProblems={solvedProblems}
-                        gameStart={!gameOver}
-                    />
-                </section>
+                <CountdownTimer
+                    initialSeconds={5}
+                    solvedProblems={solvedProblems}
+                    onGameStateChange= {handleGameStateChange}
+                    gameStart={!gameOver}
+                />
+                <MathMiniGame
+                    onSubmitData={handleAnswerCompare}
+                    solvedProblems={solvedProblems}
+                    gameStart={!gameOver}
+                />
             </>
         ) : null }
         <div className="ticks"></div>
