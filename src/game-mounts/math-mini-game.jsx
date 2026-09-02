@@ -14,8 +14,11 @@ class MathMiniGame extends React.Component
            mathFunctions: [],
            difficulty: 0,
            solvedProblems: 0,
-           hasMounted: false
+           hasMounted: false,
+           isInCooldown: false
        }
+       
+       this.rightOrWrong = 0;
    }
 
     componentDidMount() {
@@ -223,12 +226,42 @@ class MathMiniGame extends React.Component
             );
         }
     }
+    
+    turnOnCoolDown = () =>
+    {
+        this.setState(prevState => ({
+            isInCooldown: !prevState.isInCooldown
+        }))
+
+        setTimeout(() => {
+            this.setState(prevState => ({
+                isInCooldown: !prevState.isInCooldown
+            }), this.returnBackgroundToNormal()
+            );
+        }, 1000);
+    }
 
     handleSubmitAnswer = (answer) => {
+       this.turnOnCoolDown();
+       
         this.props.onSubmitData({
             value: answer,
             rightAnswer: this.printRightAnswer()
-        });
+        }, []);
+
+        if (this.props.value === this.props.rightAnswer)
+        {
+            this.rightOrWrong = 1;
+        }
+        else if (this.props.value !== this.props.rightAnswer)
+        {
+            this.rightOrWrong = -1;
+        }
+    }
+    
+    returnBackgroundToNormal = () =>
+    {
+        this.rightOrWrong = 0;
     }
 
     render() {
@@ -236,6 +269,28 @@ class MathMiniGame extends React.Component
             this.state.hasMounted && this.props.gameStart
                 ? "slide-active"
                 : "slide-inactive";
+        
+        const rightOrWrongClass = () =>
+        {
+            let newClass = "";
+            
+            if (this.rightOrWrong === 1)
+            {
+                newClass = "isRight";
+            }
+            
+            if (this.rightOrWrong === -1)
+            {
+                newClass = "isWrong";
+            }
+            
+            if (this.rightOrWrong === 0)
+            {
+                newClass = "";
+            }
+            
+            return newClass;
+        }
        
         let mathFormulaText = "";
 
@@ -257,11 +312,12 @@ class MathMiniGame extends React.Component
                     key={index}
                     value={answer}
                     onAnswer={this.handleSubmitAnswer}
+                    isDisabled={this.state.isInCooldown}
                 />
             );
         });
        
-       return (<div className={`slide-from-right ${slideClass}`} style={{ textAlign: 'center', fontFamily: 'monospace', 
+       return (<div className={`game-body ${rightOrWrongClass()} slide-from-right ${slideClass}`} style={{ textAlign: 'center', fontFamily: 'monospace', 
            fontSize: '2rem' }}>
            <div>
                <h5>
