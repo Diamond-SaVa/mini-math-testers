@@ -1,3 +1,53 @@
+.slide-from-left {
+  transform: translateX(-200%);
+  opacity: 0;
+  transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+.slide-from-left.slide-active {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.slide-from-left.slide-inactive {
+  transform: translateX(-200%);
+  opacity: 0;
+}
+
+.slide-from-right {
+  transform: translateX(200%);
+  opacity: 0;
+  transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+.slide-from-right.slide-active {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.slide-from-right.slide-inactive {
+  transform: translateX(200%);
+  opacity: 0;
+}
+
+.slide-vertical
+{
+  transform: translateY(-200%);
+  opacity: 0;
+  transition: transform 1.0s ease, opacity 0.5s ease;
+}
+
+.slide-vertical.slide-active {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.slide-vertical.slide-inactive {
+  transform: translateY(-200%);
+  height: 0;
+  opacity: 0;
+}
+
 #mathFormula {
   display: flex;
   flex-direction: column;

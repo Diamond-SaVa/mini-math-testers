@@ -9,31 +9,50 @@ class CountdownTimer extends React.Component
         this.state = {
             // Sets the timer seconds to what the initialSeconds label would be assigned.
             // If not assigned, the timer will default to 60 seconds.
-            timerSeconds: this.props.initialSeconds ?? 60
+            timerSeconds: this.props.initialSeconds ?? 60,
+            hasMounted: false
         };
         // Reference pointer for the interval timer
         this.componentTimer = null;
     }
 
+    componentDidMount() {
+        requestAnimationFrame(
+            () =>
+            {
+                this.setState({
+                    hasMounted: true
+                }, () => {
+                    // 
+                    console.log("Mounting Started")
+                })
+            }
+        );
+
+        this.activateTimer();
+    }
+
     handleTimerIncreaseComponent = (event) => {
         event.preventDefault();
 
-        if (this.componentTimer) {
-            clearInterval(this.componentTimer);
-        }
+        this.deactivateTimer();
 
         this.setState(prevState => ({
-            timerSeconds: Math.min(Math.max(prevState.timerSeconds + 5, 0), 60)
-        }));
-
-        this.componentTimer = setInterval(() => {
-            this.secondDown();
-        }, 1000);
+            timerSeconds: Math.min(
+                Math.max(
+                    prevState.timerSeconds + 5, 0
+                ), 60
+            )
+        }),
+            () =>
+            {
+                this.activateTimer();
+            });
     }
 
     // Function ticking down the timer each second.
     secondDown() {
-        if (this.state.timerSeconds > 0) {
+        if (this.state.timerSeconds >= 0) {
             this.setState((prevState) => ({
                 timerSeconds: prevState.timerSeconds - 1
             }));
@@ -42,36 +61,26 @@ class CountdownTimer extends React.Component
         {
             this.deactivateTimer()
 
-            this.props.onTimerEnd({
+            this.props.onGameStateChange({
                 bStopGame: true
             });
         }
-    }
-    
-    activateTimer() {
-        this.componentTimer = setInterval(() => {
-            this.secondDown();
-        }, 1000);
-
-        this.props.onTimerEnd({
-            bStopGame: false
-        });
     }
 
     activateTimer(newInterval = 1000) {
         this.componentTimer = setInterval(() => {
             this.secondDown();
         }, newInterval);
+
+        this.props.onGameStateChange({
+            bStopGame: false
+        });
     }
     
     deactivateTimer() {
         if (this.componentTimer) {
             clearInterval(this.componentTimer);
         }
-    }
-    
-    componentDidMount() {
-        this.activateTimer();
     }
 
     componentWillUnmount() {
@@ -105,10 +114,15 @@ class CountdownTimer extends React.Component
         const { timerSeconds } = this.state;
         
         const  progressPercentage = (timerSeconds / 60) * 100;
+
+        const slideClass =
+            this.state.hasMounted && this.props.gameStart
+                ? "slide-active"
+                : "slide-inactive";
         
         return (
-            <div style={{ textAlign: 'center', fontFamily: 'monospace', fontSize: '2rem' }}>
-                {timerSeconds > 0 ? (
+            <div className={`slide-from-left ${slideClass}`} style={{ textAlign: 'center', fontFamily: 'monospace', fontSize: '2rem' }}>
+                {timerSeconds >= 0 ? (
                     <div>
                         <h3>Time Remaining</h3>
                         <div>{this.formatTime(timerSeconds)}</div>

@@ -1,5 +1,6 @@
 ﻿import React from "react";
 import ButtonAnswer from "./button-answer.jsx";
+import './math-mini-game.css'
 
 class MathMiniGame extends React.Component 
 {
@@ -12,9 +13,23 @@ class MathMiniGame extends React.Component
            variables: [],
            mathFunctions: [],
            difficulty: 0,
-           solvedProblems: 0
+           solvedProblems: 0,
+           hasMounted: false
        }
    }
+
+    componentDidMount() {
+        requestAnimationFrame(
+            () =>
+            {
+                this.setState({
+                    hasMounted: true
+                }, () => {
+                    this.generateNumbers();
+                })
+            }
+        );
+    }
 
     printRightAnswer = () =>
     {
@@ -95,33 +110,38 @@ class MathMiniGame extends React.Component
     }
 
     generateNumbers = () => {
+       // Temporary holders of variables and math functions
+       const newVariables = [];
+       const newMathFunctions = [];
+
+        // Additive system to make a math problem with more than 2 variables if possible.
+        for (let i = 0; i <= this.state.difficulty; i++) {
+            let mathSymbol = "";
+
+            if (i === 0) {
+                const numberA = this.generateRandomNumber(0, 10);
+                newVariables.push(numberA);
+
+                mathSymbol = this.returnMathFunc(this.generateRandomNumber(0, 5));
+                newMathFunctions.push(mathSymbol);
+
+                const numberB = this.generateRandomNumber(0, 10);
+                newVariables.push(numberB);
+            }
+            else
+            {
+                mathSymbol = this.returnMathFunc(this.generateRandomNumber(0, 5));
+                newMathFunctions.push(mathSymbol);
+
+                const numberX = this.generateRandomNumber(0, 10);
+                newMathFunctions.push(numberX);
+            }
+        }
+       
         this.setState( () => {
             // Restart all Variables and Math Functions
-            this.state.variables = [];
-            this.state.mathFunctions = [];
-            // Additive system to make a math problem with more than 2 variables if possible.
-            for (let i = 0; i <= this.state.difficulty; i++) {
-                let mathSymbol = "";
-                
-                if (i === 0) {
-                    const numberA = this.generateRandomNumber(0, 10);
-                    this.state.variables.push(numberA);
-                    
-                    mathSymbol = this.returnMathFunc(this.generateRandomNumber(0, 5));
-                    this.state.mathFunctions.push(mathSymbol);
-
-                    const numberB = this.generateRandomNumber(0, 10);
-                    this.state.variables.push(numberB);
-                } 
-                else
-                {
-                    mathSymbol = this.returnMathFunc(this.generateRandomNumber(0, 5));
-                    this.state.mathFunctions.push(mathSymbol);
-
-                    const numberX = this.generateRandomNumber(0, 10);
-                    this.state.variables.push(numberX);
-                }
-            }
+            this.state.variables = newVariables;
+            this.state.mathFunctions = newMathFunctions;
         }, () => {
             this.setAnswerOrder();
         });
@@ -178,10 +198,6 @@ class MathMiniGame extends React.Component
         });
     }
 
-    componentDidMount() {
-       this.generateNumbers();
-   }
-
     componentDidUpdate(prevProps) {
         if (this.props.solvedProblems !== prevProps.solvedProblems) {
             this.setState(prevState => ({
@@ -216,10 +232,14 @@ class MathMiniGame extends React.Component
     }
 
     render() {
-
+        const slideClass =
+            this.state.hasMounted && this.props.gameStart
+                ? "slide-active"
+                : "slide-inactive";
+       
         let mathFormulaText = "";
 
-        this.state.mathFunctions.map((value, index) => {
+        this.state.mathFunctions.forEach((value, index) => {
 
             if (index === 0)
             {
@@ -231,14 +251,6 @@ class MathMiniGame extends React.Component
             }
         });
        
-        const mathFormula = () => {
-            return (
-                <p>
-                    { mathFormulaText }
-                </p>
-            );
-        }
-       
         const listOfButtons = this.state.answers.map((answer, index) => {
             return (
                 <ButtonAnswer
@@ -249,7 +261,8 @@ class MathMiniGame extends React.Component
             );
         });
        
-       return (<div style={{ textAlign: 'center', fontFamily: 'monospace', fontSize: '2rem' }}>
+       return (<div className={`slide-from-right ${slideClass}`} style={{ textAlign: 'center', fontFamily: 'monospace', 
+           fontSize: '2rem' }}>
            <div>
                <h3>
                    <p id={"mathFormula"}>{mathFormulaText} = ???</p>
