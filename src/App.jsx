@@ -2,14 +2,14 @@ import { useState } from 'react'
 import heroImg from './assets/hero.png'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
+import gameLogo from './assets/Mini-Logo.svg'
 import './App.css'
 import CountdownTimer from "./game-mounts/countdown-timer.jsx";
 import MathMiniGame from "./game-mounts/math-mini-game.jsx";
 
 function App() {
-  const [count, setCount] = useState(0);
   const [message, setMessage] = useState('');
-  const [timeBonus, setTimeBonus] = useState(0);
+  const [solvedProblems, setSolvedProblems] = useState(0);
 
     const handleTimerIncrease = (data) => {
         console.log('Received data from child form : ', data);
@@ -23,8 +23,7 @@ function App() {
         setMessage(newMessage)
 
         if (isCorrect) {
-            setTimeBonus(prev => prev + 1);
-            setCount(prev => prev + 1);
+            setSolvedProblems(prev => prev + 1);
         }
     };
 
@@ -32,9 +31,7 @@ function App() {
     <>
       <section id="center">
         <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+          <img src={gameLogo} className="base" width="170" height="179" alt="" />
         </div>
         <div>
           <h1>Mini Math Testers!</h1>
@@ -53,7 +50,7 @@ function App() {
               type="button"
               className="counter"
           >
-              Correct Answers : {count}
+              Correct Answers : {solvedProblems}
           </button>
       </section>
 
@@ -62,11 +59,11 @@ function App() {
       <section id="next-steps">
           <CountdownTimer
               initialSeconds={30}
-              timeBonus={timeBonus}
+              solvedProblems={solvedProblems}
           />
           <MathMiniGame 
               onSubmitData={handleAnswerCompare}
-              timeBonus={timeBonus}/>
+              solvedProblems={solvedProblems}/>
       </section>
 
       <div className="ticks"></div>

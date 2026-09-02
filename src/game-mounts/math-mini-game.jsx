@@ -11,7 +11,8 @@ class MathMiniGame extends React.Component
            answers: [],
            variables: [],
            mathFunctions: [],
-           difficulty: 5
+           difficulty: 0,
+           solvedProblems: 0
        }
    }
 
@@ -182,8 +183,28 @@ class MathMiniGame extends React.Component
    }
 
     componentDidUpdate(prevProps) {
-        if (this.props.timeBonus !== prevProps.timeBonus) {
-            this.generateNumbers();
+        if (this.props.solvedProblems !== prevProps.solvedProblems) {
+            this.setState(prevState => ({
+                solvedProblems: prevState.solvedProblems + 1
+            }),
+                () => {
+                
+                if(this.state.solvedProblems >= 10)
+                {
+                    this.setState(prevState => ({
+                        solvedProblems: 0,
+                        difficulty: prevState.difficulty + 1,
+                    }), () =>
+                    {
+                        this.generateNumbers();
+                    })
+                    
+                    return;
+                }
+                
+                this.generateNumbers();
+                }
+            );
         }
     }
 

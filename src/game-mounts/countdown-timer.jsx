@@ -3,7 +3,6 @@ import './countdown-timer.css'
 
 class CountdownTimer extends React.Component 
 {
-        
     constructor(props) {
         super(props);
 
@@ -19,9 +18,17 @@ class CountdownTimer extends React.Component
     handleTimerIncreaseComponent = (event) => {
         event.preventDefault();
 
+        if (this.componentTimer) {
+            clearInterval(this.componentTimer);
+        }
+
         this.setState(prevState => ({
             timerSeconds: Math.min(Math.max(prevState.timerSeconds + 5, 0), 60)
         }));
+
+        this.componentTimer = setInterval(() => {
+            this.secondDown();
+        }, 1000);
     }
 
     // Function ticking down the timer each second.
@@ -31,29 +38,47 @@ class CountdownTimer extends React.Component
                 timerSeconds: prevState.timerSeconds - 1
             }));
         } 
-        else 
+        else
         {
-            clearInterval(this.componentTimer);
+            this.deactivateTimer()
         }
     }
     
-    componentDidMount() {
+    activateTimer() {
         this.componentTimer = setInterval(() => {
             this.secondDown();
         }, 1000);
     }
 
-    componentWillUnmount() {
+    activateTimer(newInterval = 1000) {
+        this.componentTimer = setInterval(() => {
+            this.secondDown();
+        }, newInterval);
+    }
+    
+    deactivateTimer() {
         if (this.componentTimer) {
             clearInterval(this.componentTimer);
         }
     }
+    
+    componentDidMount() {
+        this.activateTimer();
+    }
+
+    componentWillUnmount() {
+        this.deactivateTimer();
+    }
 
     componentDidUpdate(prevProps) {
-        if (this.props.timeBonus !== prevProps.timeBonus) {
+        if (this.props.solvedProblems !== prevProps.solvedProblems) {
+            this.deactivateTimer();
+            
             this.setState(prevState => ({
                 timerSeconds: Math.min(Math.max(prevState.timerSeconds + 5, 0), 60) 
             }));
+
+            this.activateTimer();
         }
     }
 
