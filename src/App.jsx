@@ -8,8 +8,9 @@ import CountdownTimer from "./game-mounts/countdown-timer.jsx";
 import MathMiniGame from "./game-mounts/math-mini-game.jsx";
 
 function App() {
-  const [message, setMessage] = useState('');
-  const [solvedProblems, setSolvedProblems] = useState(0);
+    const [gameOver, setGameOver] = useState(false);
+    const [message, setMessage] = useState('');
+    const [solvedProblems, setSolvedProblems] = useState(0);
 
     const handleTimerIncrease = (data) => {
         console.log('Received data from child form : ', data);
@@ -26,6 +27,11 @@ function App() {
             setSolvedProblems(prev => prev + 1);
         }
     };
+
+
+    const handleGameOver = (data) => {
+        setGameOver(data.bStopGame);
+    }
 
   return (
     <>
@@ -55,15 +61,17 @@ function App() {
       </section>
 
       <div className="ticks"></div>
-
+        
       <section id="next-steps">
           <CountdownTimer
-              initialSeconds={30}
+              initialSeconds={5}
               solvedProblems={solvedProblems}
+              onTimerEnd = {handleGameOver}
           />
-          <MathMiniGame 
+          { gameOver === false  ? (<MathMiniGame
               onSubmitData={handleAnswerCompare}
-              solvedProblems={solvedProblems}/>
+              solvedProblems={solvedProblems}/>) : null }
+          
       </section>
 
       <div className="ticks"></div>

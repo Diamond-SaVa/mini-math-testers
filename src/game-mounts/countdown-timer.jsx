@@ -41,6 +41,10 @@ class CountdownTimer extends React.Component
         else
         {
             this.deactivateTimer()
+
+            this.props.onTimerEnd({
+                bStopGame: true
+            });
         }
     }
     
@@ -48,6 +52,10 @@ class CountdownTimer extends React.Component
         this.componentTimer = setInterval(() => {
             this.secondDown();
         }, 1000);
+
+        this.props.onTimerEnd({
+            bStopGame: false
+        });
     }
 
     activateTimer(newInterval = 1000) {
