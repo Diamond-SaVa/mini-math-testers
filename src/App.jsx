@@ -5,6 +5,8 @@ import './App.css'
 import CountdownTimer from "./game-mounts/countdown-timer.jsx";
 import MathMiniGame from "./game-mounts/math-mini-game.jsx";
 import ScoreCounter from "./game-mounts/score-counter.jsx";
+import playGameSound from "./assets/playGame.wav"
+import eraseSound from "./assets/eraser.wav"
 
 function App() {
     // Added boolean to set game over to
@@ -95,11 +97,18 @@ function App() {
         }
     }
 
+    const playLocalSound = (soundFile) => {
+        const audio = new Audio(soundFile);
+        audio.play();
+    }
+
     const deleteData = () => {
         if(localStorage.length > 0)
         {
             localStorage.removeItem("hi-score");
         }
+
+        playLocalSound(eraseSound);
         
         setDeletingState(true);
 
@@ -155,6 +164,8 @@ function App() {
                     type="button"
                     className="counter"
                     onClick={() => {
+                        playLocalSound(playGameSound);
+                        
                         initiateTimerForMenuOut();
 
                         setGameStart(true);

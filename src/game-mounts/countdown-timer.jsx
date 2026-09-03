@@ -114,7 +114,7 @@ class CountdownTimer extends React.Component
             console.log("New Difficulty from Timer : " + newDifficulty.toString());
             
             this.setState(prevState => ({
-                timerSeconds: Math.min(Math.max(prevState.timerSeconds + 5, 0), 60),
+                timerSeconds: Math.min(Math.max(prevState.timerSeconds + (5 + newDifficulty), 0), 60),
                 difficulty: newDifficulty
             }));
 

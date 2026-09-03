@@ -2,6 +2,8 @@
 import ButtonAnswer from "./button-answer.jsx";
 import './math-mini-game.css'
 import GameMessage from "./pop-up-message.jsx";
+import correctSound from "./assets/correct.wav";
+import tryAgainSound from "./assets/try_again.wav";
 
 class MathMiniGame extends React.Component 
 {
@@ -246,6 +248,8 @@ class MathMiniGame extends React.Component
        const theRightAnswer = this.printRightAnswer();
 
        const wasPlayerRightOrWrong = answer === theRightAnswer ? 1 : -1;
+
+       this.playLocalSound(answer === theRightAnswer ? correctSound : tryAgainSound);
        
        const newDifficulty = this.state.difficulty;
        
@@ -267,6 +271,11 @@ class MathMiniGame extends React.Component
         }));
     }
 
+    playLocalSound(soundFile) {
+        const audio = new Audio(soundFile);
+        audio.play();
+    }
+
     render() {
         const slideClass =
             this.state.hasMounted && this.props.gameStart
@@ -276,7 +285,6 @@ class MathMiniGame extends React.Component
         let mathFormulaText = "";
 
         this.state.mathFunctions.forEach((value, index) => {
-
             if (index === 0)
             {
                 mathFormulaText += this.state.variables[index] + " " + value + " " + this.state.variables[index + 1] ;
@@ -319,7 +327,7 @@ class MathMiniGame extends React.Component
 
             return ("");
         }
-       
+        
        return (<div className={`slide-from-right ${slideClass}`} style={{ textAlign: 'center', fontFamily: 'monospace', 
            fontSize: '2rem' }}>
            <div>
