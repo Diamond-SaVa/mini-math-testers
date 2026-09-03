@@ -1,6 +1,7 @@
 ﻿import React from "react";
 import ButtonAnswer from "./button-answer.jsx";
 import './math-mini-game.css'
+import GameMessage from "./pop-up-message.jsx";
 
 class MathMiniGame extends React.Component 
 {
@@ -15,10 +16,9 @@ class MathMiniGame extends React.Component
            difficulty: 0,
            solvedProblems: 0,
            hasMounted: false,
-           isInCooldown: false
+           isInCooldown: false,
+           rightOrWrong: 0
        }
-       
-       this.rightOrWrong = 0;
    }
 
     componentDidMount() {
@@ -40,7 +40,7 @@ class MathMiniGame extends React.Component
         
         this.state.mathFunctions.forEach((value, index) => 
         {
-            let consoleText = "";
+            let consoleText;
             if (index === 0) {
                 if (value === "+") 
                 {
@@ -236,32 +236,35 @@ class MathMiniGame extends React.Component
         setTimeout(() => {
             this.setState(prevState => ({
                 isInCooldown: !prevState.isInCooldown
-            }), this.returnBackgroundToNormal()
+            }), this.returnBackgroundToNormal
             );
         }, 1000);
     }
 
     handleSubmitAnswer = (answer) => {
-       this.turnOnCoolDown();
+       
+       const theRightAnswer = this.printRightAnswer();
+
+       const wasPlayerRightOrWrong = answer === theRightAnswer ? 1 : -1;
+       
+       const newDifficulty = this.state.difficulty;
        
         this.props.onSubmitData({
             value: answer,
-            rightAnswer: this.printRightAnswer()
+            rightAnswer: theRightAnswer,
+            difficulty: newDifficulty
         }, []);
-
-        if (this.props.value === this.props.rightAnswer)
-        {
-            this.rightOrWrong = 1;
-        }
-        else if (this.props.value !== this.props.rightAnswer)
-        {
-            this.rightOrWrong = -1;
-        }
+        
+        this.setState(({ 
+            rightOrWrong: wasPlayerRightOrWrong
+        }), this.turnOnCoolDown);
     }
     
     returnBackgroundToNormal = () =>
     {
-        this.rightOrWrong = 0;
+        this.setState(({
+            rightOrWrong: 0
+        }));
     }
 
     render() {
@@ -269,28 +272,6 @@ class MathMiniGame extends React.Component
             this.state.hasMounted && this.props.gameStart
                 ? "slide-active"
                 : "slide-inactive";
-        
-        const rightOrWrongClass = () =>
-        {
-            let newClass = "";
-            
-            if (this.rightOrWrong === 1)
-            {
-                newClass = "isRight";
-            }
-            
-            if (this.rightOrWrong === -1)
-            {
-                newClass = "isWrong";
-            }
-            
-            if (this.rightOrWrong === 0)
-            {
-                newClass = "";
-            }
-            
-            return newClass;
-        }
        
         let mathFormulaText = "";
 
@@ -316,15 +297,37 @@ class MathMiniGame extends React.Component
                 />
             );
         });
+
+        const rightOrWrongAnswer = () => {
+            if(this.state.rightOrWrong === 1)
+            {
+                return (<GameMessage
+                    isRightOrWrong={true}
+                    message={"Correct!"}
+                    canRise={true}
+                />);
+            }
+
+            if(this.state.rightOrWrong === -1)
+            {
+                return (<GameMessage
+                    isRightOrWrong={false}
+                    message={"Try Again!"}
+                    canRise={true}
+                />);
+            }
+
+            return ("");
+        }
        
-       return (<div className={`game-body ${rightOrWrongClass()} slide-from-right ${slideClass}`} style={{ textAlign: 'center', fontFamily: 'monospace', 
+       return (<div className={`slide-from-right ${slideClass}`} style={{ textAlign: 'center', fontFamily: 'monospace', 
            fontSize: '2rem' }}>
            <div>
                <h5>
                    <p id={"mathFormula"}>{mathFormulaText} = ???</p>
                </h5>
            </div>
-           <br/>
+           { rightOrWrongAnswer() }
            <div style={{ textAlign: 'center', fontFamily: 'monospace', fontSize: '2rem'}}>
                <form>
                    {listOfButtons}

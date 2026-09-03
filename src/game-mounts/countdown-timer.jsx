@@ -10,7 +10,8 @@ class CountdownTimer extends React.Component
             // Sets the timer seconds to what the initialSeconds label would be assigned.
             // If not assigned, the timer will default to 60 seconds.
             timerSeconds: this.props.initialSeconds ?? 60,
-            hasMounted: false
+            hasMounted: false,
+            difficulty: 0
         };
         // Reference pointer for the interval timer
         this.componentTimer = null;
@@ -37,10 +38,12 @@ class CountdownTimer extends React.Component
 
         this.deactivateTimer();
 
+        const { difficulty } = this.state;
+
         this.setState(prevState => ({
             timerSeconds: Math.min(
                 Math.max(
-                    prevState.timerSeconds + 5, 0
+                    prevState.timerSeconds + (5 + difficulty), 0
                 ), 60
             )
         }),
@@ -53,8 +56,10 @@ class CountdownTimer extends React.Component
     // Function ticking down the timer each second.
     secondDown() {
         if (this.state.timerSeconds >= 0) {
+            const { difficulty } = this.state;
+            
             this.setState((prevState) => ({
-                timerSeconds: prevState.timerSeconds - 1
+                timerSeconds: prevState.timerSeconds - (difficulty + 1)
             }));
         } 
         else
@@ -88,11 +93,29 @@ class CountdownTimer extends React.Component
     }
 
     componentDidUpdate(prevProps) {
+        function clamp(val, min, max) {
+            return Math.min(Math.max(val, min), max);
+        }
+
         if (this.props.solvedProblems !== prevProps.solvedProblems) {
             this.deactivateTimer();
             
+            const { difficulty } = this.props;
+            
+            let newDifficulty = difficulty;
+            
+            if (this.props.difficulty !== prevProps.difficulty)
+            {
+                newDifficulty = difficulty + 1;
+            }
+            
+            newDifficulty = clamp(newDifficulty, 0, 2);
+            
+            console.log("New Difficulty from Timer : " + newDifficulty.toString());
+            
             this.setState(prevState => ({
-                timerSeconds: Math.min(Math.max(prevState.timerSeconds + 5, 0), 60) 
+                timerSeconds: Math.min(Math.max(prevState.timerSeconds + 5, 0), 60),
+                difficulty: newDifficulty
             }));
 
             this.activateTimer();
@@ -125,6 +148,7 @@ class CountdownTimer extends React.Component
                 {timerSeconds >= 0 ? (
                     <div>
                         <h5>Time Gauge</h5>
+                        <h5>{timerSeconds}</h5>
                         <div id="progress-bg" role="progressbar" aria-valuenow={progressPercentage}
                              aria-valuemin="0" aria-valuemax="100">
                             <div

@@ -1,32 +1,47 @@
 import {useEffect, useState} from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
 import gameLogo from './assets/Mini-Logo.svg'
+import gameLogoErase from './assets/Mini-Logo_Clean.webp'
 import './App.css'
 import CountdownTimer from "./game-mounts/countdown-timer.jsx";
 import MathMiniGame from "./game-mounts/math-mini-game.jsx";
 import ScoreCounter from "./game-mounts/score-counter.jsx";
 
 function App() {
-    useEffect(() => {
-        console.log('Component has mounted!'); // Runs once on mount
-        
-        setHasMounted(true);
-
-        return () => {
-            console.log('Component will unmount!'); // Optional cleanup on unmount
-        };
-    }, []);
-    
     // Added boolean to set game over to
     const [hasMounted, setHasMounted] = useState(false);
     const [gameStart, setGameStart] = useState(false);
     const [gameOver, setGameOver] = useState(false);
     const [menuIsActive, setMenuIsActive] = useState(true);
-    const [message, setMessage] = useState('Your answer is...');
+    const [difficulty,setDifficulty] = useState(0);
     const [solvedProblems, setSolvedProblems] = useState(0);
-    const [solvedProblemsRecord, setSolvedProblemRecord] = useState(0);
+    const [solvedProblemsRecord, setSolvedProblemsRecord] = useState(0);
+    const [deletingState, setDeletingState] = useState(false);
+
+    useEffect(() => {
+        console.log('Component has mounted!'); // Runs once on mount
+        // On start up, make the app known that it's been mounted
+        setHasMounted(true);
+
+        // Define a starting value of "0" for the highScore text
+        let highScoreFromMountText = "0";
+
+        // Only proceed if the local storage contains a value within
+        if(localStorage.length > 0)
+        {
+            // update the text value of the high score from the localStorage
+            highScoreFromMountText = localStorage.getItem("hi-score");
+        }
+
+        // Set the final value in text to a numeric high score value variable
+        const highScoreValue = JSON.parse(highScoreFromMountText);
+
+        // And set it onto the setSolvedProblemsRecord
+        setSolvedProblemsRecord(highScoreValue);
+
+        return () => {
+            console.log('Component will unmount!'); // Optional cleanup on unmount
+        };
+    }, []);
 
     const initiateTimerForMenuOut = () => {
         setTimeout(() => {
@@ -41,21 +56,15 @@ function App() {
             setGameOver(false);
         }, 1100);
     };
-    
-    const compareNewRecord = () =>
-    {
-        if (solvedProblems > solvedProblemsRecord)
-        {
-            setSolvedProblemRecord(solvedProblems);
-        }
-    }
   
     const handleAnswerCompare = (data) => {
         const isCorrect = data.value === data.rightAnswer;
-
-        const newMessage = isCorrect ? "CORRECT!" : "WRONG!";
         
-        setMessage(newMessage)
+        const {difficulty} = data;
+        
+        setDifficulty(difficulty);
+        
+        console.log("Updated Difficulty from handleAnswerCompare : " + difficulty.toString());
 
         if (isCorrect) {
             const newSolvedProblems = solvedProblems + 1;
@@ -63,7 +72,13 @@ function App() {
             setSolvedProblems(newSolvedProblems);
 
             if (newSolvedProblems > solvedProblemsRecord) {
-                setSolvedProblemRecord(newSolvedProblems);
+                setSolvedProblemsRecord(newSolvedProblems);
+                
+                const newSolvedProblemText = newSolvedProblems.toString();
+                
+                localStorage.setItem("hi-score", newSolvedProblemText);
+                
+                console.log("New record obtained : " + newSolvedProblemText);
             }
         }
     };
@@ -80,6 +95,24 @@ function App() {
         }
     }
 
+    const deleteData = () => {
+        if(localStorage.length > 0)
+        {
+            localStorage.removeItem("hi-score");
+        }
+        
+        setDeletingState(true);
+
+        setSolvedProblemsRecord(0);
+        
+        setTimeout(
+            () =>
+            {
+                setDeletingState(false);
+            }, 1000
+        )
+    }
+
     const slideClassBeforeGameStart =
         hasMounted && !gameStart
             ? "slide-active"
@@ -90,21 +123,27 @@ function App() {
         { menuIsActive ? (
             <section id="center" className={`main-menu slide-vertical ${slideClassBeforeGameStart}`}>
                 <div className="hero">
-                    <p>
-                    <button
-                        type="button"
-                        className="counter"
-                        onClick={() => {
-                            initiateTimerForMenuOut();
-
-                            setGameStart(true);
-                        }}
-                    >
-                        RESET SCORE
-                    </button>
-                    </p>
-                    <img src={gameLogo} className="base" alt="" />
-                    <label className="framework">HI-SCORE : {solvedProblemsRecord}</label>
+                    
+                        { !deletingState ? (
+                            <>
+                                <p>
+                                    <button
+                                        type="button"
+                                        className="counter"
+                                        onClick={deleteData}
+                                    >
+                                        RESET SCORE
+                                    </button>
+                                </p>
+                                <img src={gameLogo} className="base" alt="game logo" />
+                            </>
+                        ) : (<img src={gameLogoErase} className="base" alt="game logo erasing data" />)}
+                    
+                    {
+                        !deletingState ? (
+                            <label className="framework">HI-SCORE : {solvedProblemsRecord}</label>
+                        ) : null
+                    }
                 </div>
                 <div>
                     <h1>Mini Math Testers!</h1>
@@ -130,13 +169,13 @@ function App() {
         { gameStart && !menuIsActive ? (
             <>
                 <ScoreCounter
-                    message = {message}
                     solvedProblems = {solvedProblems}
                     gameStart={!gameOver}
                 />
                 <CountdownTimer
-                    initialSeconds={5}
+                    initialSeconds={30}
                     solvedProblems={solvedProblems}
+                    difficulty={difficulty}
                     onGameStateChange= {handleGameStateChange}
                     gameStart={!gameOver}
                 />

@@ -1,16 +1,35 @@
 ﻿/* Created a CSS file for the math-mini-game jsx file */
 
-.game-body {
-    background-color: transparent;
-    transition: background-color 1.0s ease-out;
+.game-message {
+    position: absolute;
+    text-align: center;
+    width: 100%;
+    font-size: 16px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: 2px solid transparent;
+    margin-bottom: 24px;
+    
+    transition: transform 0.5s ease-in-out;
 }
 
-.game-body.isRight 
+.game-message.isRight 
 {
-    background-color: green;
+    background-color: darkgreen;
+    border-color: green;
+    color: white;
+    transform: translateY(100%);
 }
 
-.game-body.isWrong
+.game-message.isWrong
 {
-    background-color: red;
+    background-color: darkorange;
+    border-color: orange;
+    color: black;
+    transform: translateY(-100%);
+}
+
+.game-message.appear
+{
+    transform: translateY(0%);
 }

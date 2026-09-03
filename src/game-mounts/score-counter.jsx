@@ -34,13 +34,7 @@ class ScoreCounter extends React.Component
             <div className={`score-counter slide-vertical ${slideClass}`}>
                 <section id="center">
                     <>
-                        <button
-                            type="button"
-                            className="counter"
-                            disabled
-                        >
-                            {this.props.message}
-                        </button>
+                        <br/>
                         <button
                             type="button"
                             className="counter"
