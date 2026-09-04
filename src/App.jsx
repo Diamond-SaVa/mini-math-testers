@@ -13,8 +13,8 @@ function App() {
     const [hasMounted, setHasMounted] = useState(false);
     const [gameStart, setGameStart] = useState(false);
     const [gameOver, setGameOver] = useState(false);
+    const [exitOrder, setPleaseExit] = useState(false);
     const [menuIsActive, setMenuIsActive] = useState(true);
-    const [difficulty,setDifficulty] = useState(0);
     const [solvedProblems, setSolvedProblems] = useState(0);
     const [solvedProblemsRecord, setSolvedProblemsRecord] = useState(0);
     const [deletingState, setDeletingState] = useState(false);
@@ -52,21 +52,27 @@ function App() {
     };
 
     const initiateTimerForMenuIn = () => {
-        setTimeout(() => {
-            setMenuIsActive(true);
-            setGameStart(false);
-            setGameOver(false);
-        }, 1100);
+        
+        setTimeout(
+            () =>
+            {
+                setPleaseExit(true);
+            }, 500
+        );
+        
+        setTimeout(
+            () => 
+            {
+                setMenuIsActive(true);
+                setGameStart(false);
+                setGameOver(false);
+                setPleaseExit(false);
+            }, 1100
+        );
     };
   
     const handleAnswerCompare = (data) => {
         const isCorrect = data.value === data.rightAnswer;
-        
-        const {difficulty} = data;
-        
-        setDifficulty(difficulty);
-        
-        console.log("Updated Difficulty from handleAnswerCompare : " + difficulty.toString());
 
         if (isCorrect) {
             const newSolvedProblems = solvedProblems + 1;
@@ -184,21 +190,24 @@ function App() {
                     gameStart={!gameOver}
                 />
                 <CountdownTimer
-                    initialSeconds={30}
+                    initialSeconds={5}
                     solvedProblems={solvedProblems}
-                    difficulty={difficulty}
                     onGameStateChange= {handleGameStateChange}
                     gameStart={!gameOver}
+                    pleaseExit={exitOrder}
                 />
                 <MathMiniGame
                     onSubmitData={handleAnswerCompare}
                     solvedProblems={solvedProblems}
                     gameStart={!gameOver}
+                    pleaseExit={exitOrder}
                 />
             </>
         ) : null }
         <div className="ticks"></div>
         <section id="spacer">
+            © 2026 Ricardo Sánchez Villegas. All rights reserved.
+            Mini Math Testers is a learning prototype created as part of my study of React and web development.
         </section>
         
     </>

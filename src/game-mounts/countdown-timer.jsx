@@ -1,5 +1,6 @@
 ﻿import React from "react";
 import './countdown-timer.css'
+import gameOverSound from "./assets/gameOver_V2.wav"
 
 class CountdownTimer extends React.Component 
 {
@@ -10,8 +11,7 @@ class CountdownTimer extends React.Component
             // Sets the timer seconds to what the initialSeconds label would be assigned.
             // If not assigned, the timer will default to 60 seconds.
             timerSeconds: this.props.initialSeconds ?? 60,
-            hasMounted: false,
-            difficulty: 0
+            hasMounted: false
         };
         // Reference pointer for the interval timer
         this.componentTimer = null;
@@ -33,12 +33,17 @@ class CountdownTimer extends React.Component
         this.activateTimer();
     }
 
+    playLocalSound(soundFile) {
+        const audio = new Audio(soundFile);
+        audio.play();
+    }
+
     handleTimerIncreaseComponent = (event) => {
         event.preventDefault();
 
         this.deactivateTimer();
 
-        const { difficulty } = this.state;
+        const difficulty = Math.floor(this.props.solvedProblems / 10);
 
         this.setState(prevState => ({
             timerSeconds: Math.min(
@@ -55,21 +60,29 @@ class CountdownTimer extends React.Component
 
     // Function ticking down the timer each second.
     secondDown() {
-        if (this.state.timerSeconds >= 0) {
-            const { difficulty } = this.state;
+        this.setState(prevState => {
+            const difficulty = Math.floor(this.props.solvedProblems / 10);
             
-            this.setState((prevState) => ({
-                timerSeconds: prevState.timerSeconds - (difficulty + 1)
-            }));
-        } 
-        else
-        {
-            this.deactivateTimer()
+            const down = difficulty + 1;  
+            
+            const newTime = prevState.timerSeconds - down;
 
-            this.props.onGameStateChange({
-                bStopGame: true
-            });
-        }
+            return {
+                timerSeconds: Math.max(newTime, -1)
+            };
+        }, () => {
+            const {timerSeconds} = this.state;
+            
+            if (timerSeconds < 0) {
+                this.deactivateTimer();
+
+                this.props.onGameStateChange({
+                    bStopGame: true
+                });
+                
+                this.playLocalSound(gameOverSound);
+            }
+        });
     }
 
     activateTimer(newInterval = 1000) {
@@ -97,25 +110,15 @@ class CountdownTimer extends React.Component
             return Math.min(Math.max(val, min), max);
         }
 
-        if (this.props.solvedProblems !== prevProps.solvedProblems) {
+        if (this.props.solvedProblems > prevProps.solvedProblems) {
             this.deactivateTimer();
+
+            const difficulty = Math.floor(this.props.solvedProblems / 10);
             
-            const { difficulty } = this.props;
-            
-            let newDifficulty = difficulty;
-            
-            if (this.props.difficulty !== prevProps.difficulty)
-            {
-                newDifficulty = difficulty + 1;
-            }
-            
-            newDifficulty = clamp(newDifficulty, 0, 2);
-            
-            console.log("New Difficulty from Timer : " + newDifficulty.toString());
+            console.log("New difficulty from Timer : " + difficulty.toString());
             
             this.setState(prevState => ({
-                timerSeconds: Math.min(Math.max(prevState.timerSeconds + (5 + newDifficulty), 0), 60),
-                difficulty: newDifficulty
+                timerSeconds: Math.min(Math.max(prevState.timerSeconds + (5 + difficulty), 0), 60)
             }));
 
             this.activateTimer();
@@ -134,12 +137,14 @@ class CountdownTimer extends React.Component
     }
     
     render() {
-        const { timerSeconds } = this.state;
+        const { timerSeconds, hasMounted } = this.state;
         
         const  progressPercentage = (timerSeconds / 60) * 100;
+        
+        const { pleaseExit } = this.props;
 
         const slideClass =
-            this.state.hasMounted && this.props.gameStart
+            hasMounted && !pleaseExit
                 ? "slide-active"
                 : "slide-inactive";
         
@@ -163,7 +168,8 @@ class CountdownTimer extends React.Component
                     </div>
                 ) : (
                     <div style={{ color: 'red', fontWeight: 'bold' }}>
-                        🎉 Time's Up!
+                        <br/>
+                        <p>🎉 Time's Up!</p>
                     </div>
                 )}
             </div>

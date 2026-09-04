@@ -15,7 +15,6 @@ class MathMiniGame extends React.Component
            answers: [],
            variables: [],
            mathFunctions: [],
-           difficulty: 0,
            solvedProblems: 0,
            hasMounted: false,
            isInCooldown: false,
@@ -118,9 +117,11 @@ class MathMiniGame extends React.Component
        // Temporary holders of variables and math functions
        const newVariables = [];
        const newMathFunctions = [];
+       
+       const difficulty = Math.floor(this.props.solvedProblems / 10);
 
         // Additive system to make a math problem with more than 2 variables if possible.
-        for (let i = 0; i <= this.state.difficulty; i++) {
+        for (let i = 0; i <= difficulty; i++) {
             let mathSymbol = "";
 
             if (i === 0) {
@@ -204,24 +205,11 @@ class MathMiniGame extends React.Component
     }
 
     componentDidUpdate(prevProps) {
-        if (this.props.solvedProblems !== prevProps.solvedProblems) {
+        if (this.props.solvedProblems > prevProps.solvedProblems) {
             this.setState(prevState => ({
                 solvedProblems: prevState.solvedProblems + 1
             }),
                 () => {
-                
-                if(this.state.solvedProblems >= 10)
-                {
-                    this.setState(prevState => ({
-                        solvedProblems: 0,
-                        difficulty: prevState.difficulty + 1,
-                    }), () =>
-                    {
-                        this.generateNumbers();
-                    })
-                    
-                    return;
-                }
                 
                 this.generateNumbers();
                 }
@@ -250,13 +238,10 @@ class MathMiniGame extends React.Component
        const wasPlayerRightOrWrong = answer === theRightAnswer ? 1 : -1;
 
        this.playLocalSound(answer === theRightAnswer ? correctSound : tryAgainSound);
-       
-       const newDifficulty = this.state.difficulty;
-       
-        this.props.onSubmitData({
+
+       this.props.onSubmitData({
             value: answer,
-            rightAnswer: theRightAnswer,
-            difficulty: newDifficulty
+            rightAnswer: theRightAnswer
         }, []);
         
         this.setState(({ 
@@ -278,7 +263,7 @@ class MathMiniGame extends React.Component
 
     render() {
         const slideClass =
-            this.state.hasMounted && this.props.gameStart
+            this.state.hasMounted && !this.props.pleaseExit
                 ? "slide-active"
                 : "slide-inactive";
        
@@ -301,7 +286,10 @@ class MathMiniGame extends React.Component
                     key={index}
                     value={answer}
                     onAnswer={this.handleSubmitAnswer}
-                    isDisabled={this.state.isInCooldown}
+                    isDisabled={
+                        this.state.isInCooldown ||
+                        !this.props.gameStart
+                    }
                 />
             );
         });
@@ -328,19 +316,42 @@ class MathMiniGame extends React.Component
             return ("");
         }
         
-       return (<div className={`slide-from-right ${slideClass}`} style={{ textAlign: 'center', fontFamily: 'monospace', 
-           fontSize: '2rem' }}>
-           <div>
-               <h5>
-                   <p id={"mathFormula"}>{mathFormulaText} = ???</p>
-               </h5>
+        const printGameOrGameOver = () =>
+        {
+            const {gameStart} = this.props;
+            if (gameStart)
+            {
+                return (
+                    <>
+                        <div>
+                            <h5>
+                                <p id={"mathFormula"}>{mathFormulaText} = ???</p>
+                            </h5>
+                        </div>
+                        { rightOrWrongAnswer() }
+                        <div style={{ textAlign: 'center', fontFamily: 'monospace', fontSize: '2rem'}}>
+                            <form>
+                                {listOfButtons}
+                            </form>
+                        </div>
+                    </>
+                );
+            } 
+            else
+            {
+                return(
+                    <h5>
+                        <p>GAME OVER</p>
+                    </h5>
+                );
+            }
+        }
+        
+        return (
+            <div className={`slide-from-right ${slideClass}`} style={{ textAlign: 'center', fontFamily: 'monospace', 
+               fontSize: '2rem' }}>
+               {printGameOrGameOver()}
            </div>
-           { rightOrWrongAnswer() }
-           <div style={{ textAlign: 'center', fontFamily: 'monospace', fontSize: '2rem'}}>
-               <form>
-                   {listOfButtons}
-               </form>
-           </div>
-       </div>)
+        )
    }
 } export default MathMiniGame

@@ -1,4 +1,5 @@
 ﻿import React from "react";
+import starImg from "./assets/STAR.svg"
 
 class ScoreCounter extends React.Component 
 {
@@ -24,6 +25,28 @@ class ScoreCounter extends React.Component
         );
     }
     
+    starCount = () => 
+    {
+        // obtains the rank in the current play state
+        const ranks = Math.floor(this.props.solvedProblems / 10);
+
+        // prepares an array to store the images
+        const stars = [];
+
+        // and according to how many ranks one has, a star will appear
+        for (let i = 0; i < ranks; i++) {
+            stars.push(
+                <img
+                    key={i}
+                    src={starImg}
+                    alt="Achievement"
+                />
+            );
+        }
+
+        return stars;
+    }
+    
     render () {
         const slideClass =
             this.state.hasMounted && this.props.gameStart
@@ -42,6 +65,11 @@ class ScoreCounter extends React.Component
                         >
                             Correct Answers : {this.props.solvedProblems}
                         </button>
+                        <div style={{ position: 'absolute', width:"100%", top: "10%" }}>
+                            {
+                                this.starCount()
+                            }
+                        </div>
                     </>
                 </section>
             </div>
