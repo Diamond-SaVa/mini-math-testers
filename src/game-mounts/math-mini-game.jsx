@@ -1,7 +1,8 @@
 ﻿import React from "react";
-import ButtonAnswer from "./button-answer.jsx";
 import './math-mini-game.css'
+import ButtonAnswer from "./button-answer.jsx";
 import GameMessage from "./pop-up-message.jsx";
+import { playLocalSound } from "../utilities/audio-utils.js";
 import correctSound from "./assets/correct.wav";
 import tryAgainSound from "./assets/try_again.wav";
 
@@ -39,21 +40,23 @@ class MathMiniGame extends React.Component
     {
         let theAnswer = 0;
         
-        this.state.mathFunctions.forEach((value, index) => 
+        const {mathFunctions, variables } = this.state;
+
+        mathFunctions.forEach((value, index) => 
         {
             let consoleText;
             if (index === 0) {
                 if (value === "+") 
                 {
-                    theAnswer = (this.state.variables[index] + this.state.variables[index + 1]);
-                    consoleText = this.state.variables[index].toString() + " + " + 
-                        this.state.variables[index + 1].toString() + " = " + theAnswer.toString();
+                    theAnswer = (variables[index] + variables[index + 1]);
+                    consoleText = variables[index].toString() + " + " + 
+                        variables[index + 1].toString() + " = " + theAnswer.toString();
                 } 
                 else 
                 {
-                    theAnswer = (this.state.variables[index] - this.state.variables[index + 1]);
-                    consoleText = this.state.variables[index].toString() + " - " +
-                        this.state.variables[index + 1].toString() + " = " + theAnswer.toString();
+                    theAnswer = (variables[index] - variables[index + 1]);
+                    consoleText = variables[index].toString() + " - " +
+                        variables[index + 1].toString() + " = " + theAnswer.toString();
                 }
                 
                 console.log(consoleText)
@@ -64,15 +67,15 @@ class MathMiniGame extends React.Component
                 
                 if (value === "+")
                 {
-                    theAnswer += this.state.variables[index + 1];
+                    theAnswer += variables[index + 1];
                     
-                    consoleText += " + " + this.state.variables[index + 1].toString() + " = " + theAnswer.toString();
+                    consoleText += " + " + variables[index + 1].toString() + " = " + theAnswer.toString();
                 }
                 else
                 {
-                    theAnswer -= this.state.variables[index + 1];
+                    theAnswer -= variables[index + 1];
 
-                    consoleText += " - " + this.state.variables[index + 1].toString() + " = " + theAnswer.toString();
+                    consoleText += " - " + variables[index + 1].toString() + " = " + theAnswer.toString();
                 }
 
                 console.log(consoleText)
@@ -205,9 +208,13 @@ class MathMiniGame extends React.Component
     }
 
     componentDidUpdate(prevProps) {
-        if (this.props.solvedProblems > prevProps.solvedProblems) {
+        const { solvedProblems: newSolvedProblems } = this.props;
+
+        const { solvedProblems: prevSolvedProblems } = prevProps;
+       
+        if (newSolvedProblems > prevSolvedProblems) {
             this.setState(prevState => ({
-                solvedProblems: prevState.solvedProblems + 1
+                solvedProblems: prevSolvedProblems + 1
             }),
                 () => {
                 
@@ -237,7 +244,7 @@ class MathMiniGame extends React.Component
 
        const wasPlayerRightOrWrong = answer === theRightAnswer ? 1 : -1;
 
-       this.playLocalSound(answer === theRightAnswer ? correctSound : tryAgainSound);
+       playLocalSound(answer === theRightAnswer ? correctSound : tryAgainSound);
 
        this.props.onSubmitData({
             value: answer,
@@ -256,46 +263,44 @@ class MathMiniGame extends React.Component
         }));
     }
 
-    playLocalSound(soundFile) {
-        const audio = new Audio(soundFile);
-        audio.play();
-    }
-
     render() {
+        const { hasMounted, mathFunctions, variables, answers, isInCooldown, rightOrWrong } = this.state;
+        const { pleaseExit, gameStart } = this.props;
+       
         const slideClass =
-            this.state.hasMounted && !this.props.pleaseExit
+            hasMounted && !pleaseExit
                 ? "slide-active"
                 : "slide-inactive";
        
         let mathFormulaText = "";
 
-        this.state.mathFunctions.forEach((value, index) => {
+        mathFunctions.forEach((value, index) => {
             if (index === 0)
             {
-                mathFormulaText += this.state.variables[index] + " " + value + " " + this.state.variables[index + 1] ;
+                mathFormulaText += variables[index] + " " + value + " " + variables[index + 1] ;
             }
             else
             {
-                mathFormulaText += " " + value + " " + this.state.variables[index + 1];
+                mathFormulaText += " " + value + " " + variables[index + 1];
             }
         });
        
-        const listOfButtons = this.state.answers.map((answer, index) => {
+        const listOfButtons = answers.map((answer, index) => {
             return (
                 <ButtonAnswer
                     key={index}
                     value={answer}
                     onAnswer={this.handleSubmitAnswer}
                     isDisabled={
-                        this.state.isInCooldown ||
-                        !this.props.gameStart
+                        isInCooldown ||
+                        !gameStart
                     }
                 />
             );
         });
 
         const rightOrWrongAnswer = () => {
-            if(this.state.rightOrWrong === 1)
+            if(rightOrWrong === 1)
             {
                 return (<GameMessage
                     isRightOrWrong={true}
@@ -304,7 +309,7 @@ class MathMiniGame extends React.Component
                 />);
             }
 
-            if(this.state.rightOrWrong === -1)
+            if(rightOrWrong === -1)
             {
                 return (<GameMessage
                     isRightOrWrong={false}

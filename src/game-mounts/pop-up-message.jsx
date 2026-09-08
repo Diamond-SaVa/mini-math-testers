@@ -5,14 +5,13 @@ class GameMessage extends React.Component {
 
     constructor(props) {
         super(props);
-
-        const message = this.props.message;
-        const wasRightOrWrong = this.props.isRightOrWrong
+        
+        const {message, isRightOrWrong} = this.props;
         
         this.state = {
             hasMounted: false,
             textMessage: message,
-            rightOrWrong: wasRightOrWrong
+            rightOrWrong: isRightOrWrong
         }
     }
 
@@ -38,16 +37,18 @@ class GameMessage extends React.Component {
     }
     
     render() {
+        const {hasMounted, rightOrWrong, textMessage} = this.state;
+        
         const slideClass =
-            this.state.hasMounted && this.props.canRise
+            hasMounted && this.props.canRise
                 ? "appear"
                 : "";
         
-        const getAnswerResult = this.state.rightOrWrong ? "isRight" : "isWrong";
+        const getAnswerResult = rightOrWrong ? "isRight" : "isWrong";
         
         return (
             <div className={`game-message ${getAnswerResult} ${slideClass}`}>
-                <p> {this.state.textMessage} </p>
+                <p> {textMessage} </p>
             </div>
         );
     }

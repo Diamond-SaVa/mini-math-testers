@@ -7,15 +7,17 @@ class ButtonAnswer extends React.Component
     }
     
     render() {
+        const { isDisabled, onAnswer, value } = this.props;
+        
         const buttonIsDisabled = () => {
-            return this.props.isDisabled ? "disabled" : "enabled";
+            return isDisabled ? "disabled" : "enabled";
         }
         
         return (
             <button type="button"
                     className={"counter answer " + buttonIsDisabled()}
-                    onClick={() => this.props.onAnswer(this.props.value)}
-                    disabled={this.props.isDisabled}>
+                    onClick={() => onAnswer(value)}
+                    disabled={isDisabled}>
                 {this.props.value}
             </button>
         )

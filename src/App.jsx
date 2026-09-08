@@ -1,10 +1,11 @@
 import {useEffect, useState} from 'react'
+import './App.css'
 import gameLogo from './assets/Mini-Logo.svg'
 import gameLogoErase from './assets/Mini-Logo_Clean.webp'
-import './App.css'
 import CountdownTimer from "./game-mounts/countdown-timer.jsx";
 import MathMiniGame from "./game-mounts/math-mini-game.jsx";
 import ScoreCounter from "./game-mounts/score-counter.jsx";
+import { playLocalSound } from "./utilities/audio-utils.js";
 import playGameSound from "./assets/playGame.wav"
 import eraseSound from "./assets/eraser.wav"
 
@@ -101,11 +102,6 @@ function App() {
             
             setSolvedProblems(0);
         }
-    }
-
-    const playLocalSound = (soundFile) => {
-        const audio = new Audio(soundFile);
-        audio.play();
     }
 
     const deleteData = () => {
@@ -206,8 +202,14 @@ function App() {
         ) : null }
         <div className="ticks"></div>
         <section id="spacer">
-            © 2026 Ricardo Sánchez Villegas. All rights reserved.
-            Mini Math Testers is a learning prototype created as part of my study of React and web development.
+            <footer className="footer">
+                <p>
+                    © 2026 Ricardo Sánchez Villegas. All rights reserved.
+                </p>
+                <p>
+                    Mini Math Testers is a learning prototype created as part of my study of React and web development.
+                </p>
+            </footer>
         </section>
         
     </>

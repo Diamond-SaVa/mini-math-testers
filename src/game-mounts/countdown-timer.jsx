@@ -1,6 +1,7 @@
 ﻿import React from "react";
 import './countdown-timer.css'
 import gameOverSound from "./assets/gameOver_V2.wav"
+import { playLocalSound } from "../utilities/audio-utils.js";
 
 class CountdownTimer extends React.Component 
 {
@@ -33,17 +34,14 @@ class CountdownTimer extends React.Component
         this.activateTimer();
     }
 
-    playLocalSound(soundFile) {
-        const audio = new Audio(soundFile);
-        audio.play();
-    }
-
     handleTimerIncreaseComponent = (event) => {
         event.preventDefault();
 
         this.deactivateTimer();
+        
+        const {solvedProblems} = this.props;
 
-        const difficulty = Math.floor(this.props.solvedProblems / 10);
+        const difficulty = Math.floor(solvedProblems / 10);
 
         this.setState(prevState => ({
             timerSeconds: Math.min(
@@ -61,7 +59,9 @@ class CountdownTimer extends React.Component
     // Function ticking down the timer each second.
     secondDown() {
         this.setState(prevState => {
-            const difficulty = Math.floor(this.props.solvedProblems / 10);
+            const {solvedProblems} = this.props;
+            
+            const difficulty = Math.floor(solvedProblems / 10);
             
             const down = difficulty + 1;  
             
@@ -80,7 +80,7 @@ class CountdownTimer extends React.Component
                     bStopGame: true
                 });
                 
-                this.playLocalSound(gameOverSound);
+                playLocalSound(gameOverSound);
             }
         });
     }
@@ -109,19 +109,29 @@ class CountdownTimer extends React.Component
         function clamp(val, min, max) {
             return Math.min(Math.max(val, min), max);
         }
+        
+        const { solvedProblems: newSolvedProblems } = this.props;
+        
+        const { solvedProblems: prevSolvedProblems } = prevProps;
 
-        if (this.props.solvedProblems > prevProps.solvedProblems) {
+        if (newSolvedProblems > prevSolvedProblems) {
             this.deactivateTimer();
 
-            const difficulty = Math.floor(this.props.solvedProblems / 10);
-            
-            console.log("New difficulty from Timer : " + difficulty.toString());
-            
-            this.setState(prevState => ({
-                timerSeconds: Math.min(Math.max(prevState.timerSeconds + (5 + difficulty), 0), 60)
-            }));
+            const difficulty = 
+                clamp (
+                    Math.floor(newSolvedProblems / 10),
+                    0, 2
+                );
 
-            this.activateTimer();
+            this.setState(prevState => ({
+                timerSeconds: Math.min(
+                    Math.max(
+                        prevState.timerSeconds + (5 + difficulty),
+                        0), 60
+                )
+            }), () => {
+                this.activateTimer();
+            });
         }
     }
 

@@ -1,5 +1,5 @@
 ﻿import React from "react";
-import starImg from "./assets/STAR.svg"
+import StarRecord from "./star-record.jsx";
 
 class ScoreCounter extends React.Component 
 {
@@ -36,10 +36,8 @@ class ScoreCounter extends React.Component
         // and according to how many ranks one has, a star will appear
         for (let i = 0; i < ranks; i++) {
             stars.push(
-                <img
-                    key={i}
-                    src={starImg}
-                    alt="Achievement"
+                <StarRecord
+                    id={i}
                 />
             );
         }
