@@ -172,9 +172,6 @@ class CountdownTimer extends React.Component
                             >
                             </div>
                         </div>
-                        <button type="submit" className="counter" onClick={this.handleTimerIncreaseComponent}>
-                            COUNT UP
-                        </button>
                     </div>
                 ) : (
                     <div style={{ color: 'red', fontWeight: 'bold' }}>

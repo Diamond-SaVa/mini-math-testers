@@ -186,7 +186,7 @@ function App() {
                     gameStart={!gameOver}
                 />
                 <CountdownTimer
-                    initialSeconds={5}
+                    initialSeconds={30}
                     solvedProblems={solvedProblems}
                     onGameStateChange= {handleGameStateChange}
                     gameStart={!gameOver}
